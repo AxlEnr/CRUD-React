@@ -1,0 +1,12 @@
+:root{
+    --primary-color: #002b5b; /*DARK BLUE*/
+    --secondary-color: #d4af37; /*GOLDEN*/
+    --bone-color: #f8f8f8; 
+    --gray-color: #2c2c2c; 
+    --gray-blue-color: #6c7a89; 
+    --ivory-color: #fff8e7;  /*COLOR MARFIL*/
+
+    /*FONTS*/
+    --primary-font: 'primaryFont';
+
+}

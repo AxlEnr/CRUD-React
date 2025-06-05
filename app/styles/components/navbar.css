@@ -1,0 +1,24 @@
+.navbar-container{
+    padding: 20px;
+    text-align: center;
+    background-color: var(--primary-color);
+    color: var(--ivory-color);
+    font-size: large;
+}
+
+.navbar-href{
+    margin-inline: 30px;
+}
+
+.navbar-href:hover{
+    text-decoration: underline;
+    text-decoration-style:solid;
+    text-decoration-thickness: 4px;
+    text-underline-offset: 7px;
+    
+    color: var(--secondary-color);
+}
+
+.nb-name:hover{
+    color: var(--secondary-color);
+}
