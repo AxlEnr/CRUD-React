@@ -1,0 +1,16 @@
+@import "tailwindcss";
+@import './styles/constants/constants.css';
+@import './styles/components/navbar.css';
+
+@font-face {
+  font-family: 'primaryFont';
+  src: url('/assets/fonts/primaryFont.ttf') format('truetype');
+}
+
+html, body {
+  @apply bg-white dark:bg-gray-950;
+  font-family: var(--primary-font);
+  @media (prefers-color-scheme: dark) {
+    color-scheme: dark;
+  }
+}
