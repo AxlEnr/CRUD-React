@@ -1,0 +1,20 @@
+.dash-container{
+    background-color: var(--gray-color);
+    color: var(--ivory-color);
+}
+
+.dash-svg{
+    width: 30px;
+}
+
+.sizeFont{
+    font-size: large;
+}
+
+.dash-svg2{
+    width: 40px;
+}
+
+.dash-svg-normal{
+    max-width: 30%;
+}
