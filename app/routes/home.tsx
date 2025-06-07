@@ -4,7 +4,7 @@ import { Index } from "../pages/index"
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "Losiones" },
+    { title: "Mӕká" },
     { name: "description", content: "Welcome to React Router!" },
   ];
 }

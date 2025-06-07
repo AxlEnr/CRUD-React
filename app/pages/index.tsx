@@ -5,12 +5,28 @@ import type { Profesor } from 'app/interfaces/userInterface';
 
 
 export function Index() {
-  const [profesores, setProfesores] = useState<Profesor[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    const containers = document.querySelectorAll('.video-container');
 
-  const apiUrl = getEnviroments().apiUrl;
+    containers.forEach(container => {
+      const video = container.querySelector('video');
 
+      container.addEventListener('mouseenter', () => {
+        if (video) {
+          video.play();
+        }
+      });
+
+      container.addEventListener('mouseleave', () => {
+        if (video) {
+          video.pause();
+          
+        }
+      });
+    });
+  }, []);
+
+  /*
   useEffect(() => {
     const fetchProfesores = async () => {
       try {
@@ -47,49 +63,53 @@ export function Index() {
     if (loading) return <p>Cargando...</p>;
     if (error) return <p>Error: {error}</p>;
     
-
-  return (
+  */
+return (
     <main>
-      <h1 className="text-xl font-bold mb-4">Lista de Profesores</h1>
-      <ul>
-        {profesores.map((prof, i) => (
-          <li key={i} className="mb-2">
-            <strong>Nombre:</strong> {prof.nombre} <br />
-            <strong>Correo:</strong> {prof.correo}
-            <strong>Contrasena: </strong> {prof.contrasena}
-          </li>
-        ))}
-      </ul>
-      <div className='w-screen h-screen flex items-center justify-center'>
-        <div className="w-full h-full grid grid-cols-1 sm:grid-cols-2">
-          <div className="w-full h-full object-cover relative opacity-40 hover:opacity-100 transition-all">
-              <img
-                  src="/assets/imgs/menLS.webp"
-                  alt="Hombre"
-                  className="w-full h-full object-cover "
-              />
-              <h2 
-              className="absolute inset-0 flex items-end justify-center text-white text-6xl font-bold mb-20 primaryFont">
-                  Fragancias para hombre
-              </h2>
-          </div>
-          <div className="w-full h-full object-cover opacity-40 hover:opacity-100 relative transition-all">
-              <img
-                  src="/assets/imgs/wmnLS.jpeg"
-                  alt="Mujer"
-                  className="w-full h-full object-cover "
-              />
-              <h2 
-              className="absolute inset-0 flex items-end justify-center text-white text-6xl font-bold mb-20 primaryFont">
-                  Fragancias para mujer
-              </h2>
+      <section className="video-section">
+        <div className="logo-image">
+          <img 
+            src="/assets/imgs/maeka.png" 
+            className="background-image" 
+            alt="logo"
+          />
+        
+        </div>
 
-          </div>
-              
+        <div className="video-container">
+          <img 
+            src="/assets/imgs/Dior.jpg" 
+            className="background-image" 
+            alt="Hombre"
+          />
+          <video
+            src="/assets/videos/hombre.mp4"
+            className="video"
+            muted
+            preload="auto"
+            playsInline
+            loop
+          />
+        
+        </div>
+
+        <div className="video-container">
+          <img 
+            src="/assets/imgs/gdior.webp" 
+            className="background-image" 
+            alt="Mujer"
+          />
+          <video
+            src="/assets/videos/mujer.mp4"
+            className="video"
+            muted
+            preload="auto"
+            playsInline
+            loop
+          />
           
-        </div>        
-      </div>
-
+        </div>
+      </section>
     </main>
   );
 }
