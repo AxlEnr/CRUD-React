@@ -1,38 +1,61 @@
+
+import { useEffect } from 'react';
 import Navbar from '../components/Navbar/Navbar';
 
 export function Index() {
+  useEffect(() => {
+    const containers = document.querySelectorAll('.video-container');
+
+    containers.forEach(container => {
+      const video = container.querySelector('video');
+
+      container.addEventListener('mouseenter', () => {
+        if (video) {
+          video.play();
+        }
+      });
+
+      container.addEventListener('mouseleave', () => {
+        if (video) {
+          video.pause();
+          
+        }
+      });
+    });
+  }, []);
+
+
   return (
     <main>
-      <div className='w-screen h-screen flex items-center justify-center'>
-        <div className="w-full h-full grid grid-cols-1 sm:grid-cols-2">
-          <div className="w-full h-full object-cover relative opacity-40 hover:opacity-100 transition-all">
-              <img
-                  src="/assets/imgs/menLS.webp"
-                  alt="Hombre"
-                  className="w-full h-full object-cover "
-              />
-              <h2 
-              className="absolute inset-0 flex items-end justify-center text-white text-6xl font-bold mb-20 primaryFont">
-                  Fragancias para hombre
-              </h2>
-          </div>
-          <div className="w-full h-full object-cover opacity-40 hover:opacity-100 relative transition-all">
-              <img
-                  src="/assets/imgs/wmnLS.jpeg"
-                  alt="Mujer"
-                  className="w-full h-full object-cover "
-              />
-              <h2 
-              className="absolute inset-0 flex items-end justify-center text-white text-6xl font-bold mb-20 primaryFont">
-                  Fragancias para mujer
-              </h2>
+  <section className="video-section">
+    
+    <h1 className="logo-text">Eau D'Luxe</h1>
 
-          </div>
-              
-          
-        </div>        
-      </div>
+    <div className="video-container">
+      <video
+        src="/assets/videos/hombre.mp4"
+        className="video"
+        muted
+        preload="auto"
+        playsInline
+      />
+      <span className="hover-text">Hombre</span>
+    </div>
 
-    </main>
+    <div className="video-container">
+      <video
+        src="/assets/videos/mujer.mp4"
+        className="video"
+        muted
+        preload="auto"
+        playsInline
+      />
+      <span className="hover-text">Mujer</span>
+    </div>
+
+  </section>
+</main>
+
   );
 }
+
