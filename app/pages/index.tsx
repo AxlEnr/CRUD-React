@@ -72,7 +72,8 @@ return (
             src="/assets/imgs/maeka.png" 
             className="background-image" 
             alt="logo"
-          />
+        />
+        
         
         </div>
 

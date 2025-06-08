@@ -1,6 +1,8 @@
 
 import type { Route } from ".react-router/types/app/+types/root";
-import { Index } from "../pages/index" 
+import { Index } from "../pages/index"
+import CartPage from "../pages/cart";
+import { Car } from "lucide-react";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -10,5 +12,5 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
-  return <Index />;
+  return <CartPage />;
 }
