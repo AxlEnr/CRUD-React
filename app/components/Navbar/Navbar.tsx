@@ -17,7 +17,7 @@ function Navbar() {
             
             {/* Menú principal */}
             <div className="hidden md:flex items-center space-x-1">
-              <a href="#" className="py-4 px-3 navbar-href">
+              <a href="/home" className="py-4 px-3 navbar-href">
                 Inicio
               </a>
               <a href="#" className="py-4 px-3 navbar-href">

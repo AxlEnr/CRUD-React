@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
-import { getEnviroments } from 'app/envs/getEnvs';
-import type { Profesor } from 'app/interfaces/userInterface';
+import Navbar from 'app/components/Navbar/Navbar';
+import { useEffect } from 'react';
 
 
 
@@ -66,6 +65,7 @@ export function Index() {
   */
 return (
     <main>
+      <Navbar />
       <section className="video-section">
         <div className="logo-image">
           <img 

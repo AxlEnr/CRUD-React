@@ -1,5 +1,7 @@
-export interface Profesor {
+export interface User {
   nombre: string;
   correo: string;
   contrasena: string;
+  rol: string;
+  edad: string;
 }
