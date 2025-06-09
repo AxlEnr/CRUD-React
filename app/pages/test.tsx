@@ -2,7 +2,13 @@ import Dashboard from "app/components/Dashboard/Dashboard";
 import Navbar from "app/components/Navbar/Navbar";
 import { useEffect, useState } from "react";
 import { getEnviroments } from "app/envs/getEnvs";
-import type { User } from "app/interfaces/userInterface";
+import type { User } from "app/interfaces/users.interface/createUserInterface";
+import { Button } from "app/styles/components/button";
+import SubmitButton from "app/components/Button/submitButton";
+import { ContactForm } from "app/components/ContactForm";
+import { Loader } from "app/components/Loader";
+import { Modal } from "app/components/Modal";
+import { ProductCard } from "app/components/ProductCard";
 
 export function Test() {
   const apiUrl = getEnviroments().apiUrl;
@@ -50,7 +56,6 @@ export function Test() {
   return (
     <main>
       <Navbar />
-      <Dashboard />
       <h1>PRUEBAS</h1>
       <form onSubmit={(e) => {
         e.preventDefault();
@@ -70,7 +75,7 @@ export function Test() {
         onChange={(e) => setApellido(e.target.value)}
         required
         />
-        <button type="submit">Enviar</button>
+        <SubmitButton />
         </form>
       
     </main>
