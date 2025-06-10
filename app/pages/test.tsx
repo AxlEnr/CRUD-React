@@ -75,7 +75,7 @@ export function Test() {
         onChange={(e) => setApellido(e.target.value)}
         required
         />
-        <SubmitButton />
+        <SubmitButton variant="amber" text="Enviar Formulario" />
         </form>
       
     </main>

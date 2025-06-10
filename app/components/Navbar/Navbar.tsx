@@ -37,7 +37,11 @@ function Navbar() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex justify-between">
             <div className="flex items-center py-4">
-              <h1 className="text-2xl font-bold nb-name">Nombre del e-commerce</h1>
+                    <img 
+                  src="/assets/imgs/maeka2.png" 
+                  className="background-image w-22.5" 
+                  alt="logo"
+              />
             </div>
             
             

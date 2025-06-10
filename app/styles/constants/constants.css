@@ -13,7 +13,8 @@
     --green-color: #007a5e;        
     --green-color-soft: #2ea67f; 
     --amber-color: #d97706;
-    --amber-color-soft: #fbbf24;
+    --amber-color-soft: #d59347;
+    --amber-dark: rgb(120 53 15);
 
     /*FONTS*/
     --primary-font: 'primaryFont';
