@@ -3,6 +3,7 @@
 @import './styles/components/navbar.css';
 @import './styles/components/dashboard.css';
 @import './styles/components/alerts.css';
+@import './styles/components/submitButton.css';
 @font-face {
   font-family: 'primaryFont';
   src: url('/assets/fonts/primaryFont.ttf') format('truetype');
