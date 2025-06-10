@@ -1,0 +1,75 @@
+.blue-button {
+  background-color: var(--primary-color);
+  color: var(--ivory-color);
+  padding: 0.5rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: background-color 0.3s, transform 0.2s;
+  border: none;
+}
+
+.blue-button:hover {
+  background-color: var(--primary-color-soft);
+  transform: scale(1.02);
+}
+
+.blue-button:active {
+  transform: scale(0.97);
+}
+
+.green-button {
+  background-color: var(--green-color);
+  color: var(--ivory-color);
+  padding: 0.5rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: background-color 0.3s, transform 0.2s;
+  border: none;
+}
+
+.green-button:hover {
+  background-color: var(--green-color-soft);
+  transform: scale(1.02);
+}
+
+.green-button:active {
+  transform: scale(0.97);
+}
+
+.wine-button {
+  background-color: var(--wine-color);
+  color: var(--ivory-color);
+  padding: 0.5rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: background-color 0.3s, transform 0.2s;
+  border: none;
+}
+
+.wine-button:hover {
+  background-color: var(--wine-color-soft);
+  transform: scale(1.02);
+}
+
+.wine-button:active {
+  transform: scale(0.97);
+}
+
+.amber-button {
+  background-color: var(--amber-color);
+  color: var(--gray-color);
+  padding: 0.5rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: background-color 0.3s, transform 0.2s;
+  border: none;
+}
+
+.amber-button:hover {
+  background-color: var(--amber-color-soft);
+  transform: scale(1.02);
+}
+
+.amber-button:active {
+  transform: scale(0.97);
+}

@@ -1,13 +1,19 @@
-export default function SubmitButton() {
+interface SubmitButtonProps {
+  variant?: 'blue' | 'green' | 'wine' | 'amber';
+  text?: string;
+}
+
+export default function SubmitButton({ variant = 'blue', text = 'Enviar' }: SubmitButtonProps) {
+  const classMap = {
+    blue: 'blue-button',
+    green: 'green-button',
+    wine: 'wine-button',
+    amber: 'amber-button',
+  };
+
   return (
-    <button
-      type="submit"
-      className="px-6 py-2 rounded-full font-semibold text-[#fff8e7] bg-[#002b5b]
-                 hover:bg-[#d4af37] hover:text-[#002b5b]
-                 focus:outline-none focus:ring-4 focus:ring-[#d4af37]/50
-                 active:scale-95 transition-all duration-300 shadow-md hover:shadow-lg"
-    >
-      Enviar
+    <button type="submit" className={classMap[variant]}>
+      {text}
     </button>
   );
 }
