@@ -1,14 +1,16 @@
 .dash-container{
-    background-color: var(--gray-color);
+    background-color: var(--color-black);
+    border: 1px solid var(--amber-dark);
     color: var(--ivory-color);
 }
+
 
 .dash-svg{
     width: 30px;
 }
 
 .sizeFont{
-    font-size: larger;
+    font-size: 22px;
 }
 
 .dash-svg2{
