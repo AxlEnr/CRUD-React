@@ -7,6 +7,9 @@ const routes = [
   route("/home", "routes/home2.routes.tsx"),
   route("/register", "routes/shared/registerUser.routes.tsx"),
   route("/login", "routes/shared/loginUser.routes.tsx"),
+  route("/usuarios", "routes/usuarios.tsx"),
+  route("/productos", "routes/productos.tsx"),
+
 ] satisfies RouteConfigEntry[];
 
 export default routes;
