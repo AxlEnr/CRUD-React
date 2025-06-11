@@ -18,7 +18,7 @@ export function UsuariosPage() {
     setError(null);
 
     try {
-      const res = await fetch(`${apiUrl}/api/users`, {
+      const res = await fetch(`${apiUrl}/users`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
