@@ -1,24 +1,32 @@
 .navbar-container{
-    padding: 20px;
-    text-align: center;
-    background-color: var(--primary-color);
+    background-color: var(--color-black);
+    border: 1px solid var(--amber-dark);
     color: var(--ivory-color);
-    font-size: large;
-}
-
-.navbar-href{
-    margin-inline: 30px;
 }
 
 .navbar-href:hover{
     text-decoration: underline;
     text-decoration-style:solid;
-    text-decoration-thickness: 4px;
-    text-underline-offset: 7px;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 6px;
     
-    color: var(--secondary-color);
+    color: var(--amber-color);
 }
 
 .nb-name:hover{
-    color: var(--secondary-color);
+    color: var(--amber-color);
+}
+
+.dropdown:hover{
+    color: var(--amber-color);
+}
+
+.dropdown-menu{
+    background-color: var(--ivory-color);
+    color: var(--color-black);
+}
+
+.dropdown-select:hover{
+    color: var(--color-black);
+    background-color: var(--amber-color-soft);
 }

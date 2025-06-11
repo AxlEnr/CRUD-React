@@ -1,7 +1,9 @@
 @import "tailwindcss";
 @import './styles/constants/constants.css';
 @import './styles/components/navbar.css';
-
+@import './styles/components/dashboard.css';
+@import './styles/components/alerts.css';
+@import './styles/components/submitButton.css';
 @font-face {
   font-family: 'primaryFont';
   src: url('/assets/fonts/primaryFont.ttf') format('truetype');
@@ -16,7 +18,6 @@ html, body {
 }
 
 
-
 .video-section {
   display: flex;
   height: 100vh;
@@ -28,6 +29,10 @@ html, body {
   overflow: hidden;
   position: relative;
   transition: width 0.5s ease;
+
+  background-size: cover;
+  background-position: center;
+
 }
 
 
@@ -37,7 +42,7 @@ html, body {
   object-fit: cover;
   opacity: 0.8;
   transition: opacity 0.5s ease;
-  
+
   pointer-events: none; 
 }
 
@@ -58,11 +63,33 @@ html, body {
   text-shadow: 1px 1px 5px black;
 }
 
-.video-container:hover .hover-text {
+
+.video-container .background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   opacity: 1;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
 }
 
+.video-container:hover .background-image {
+  opacity: 0;
+}
+
+
+
 .logo-text {
+  z-index: 1;
+  pointer-events: none;
+  width: 500px;
+  height: 500px; 
+}
+
+.logo-image {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -75,4 +102,44 @@ html, body {
   pointer-events: none; 
 }
 
+/*
+.logo-image {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+  */
+
+  /* Agrega esto a tus estilos */
+.font-serif {
+  font-family: 'primaryFont', serif;
+}
+
+.bg-amber-50 {
+  background-color: #fffbeb;
+}
+
+.bg-amber-600 {
+  background-color: #d97706;
+}
+
+.hover\:bg-amber-700:hover {
+  background-color: #b45309;
+}
+
+.text-amber-600 {
+  color: #d97706;
+}
+
+.hover\:text-amber-800:hover {
+  color: #92400e;
+}
+
+.border-gray-100 {
+  border-color: #f3f4f6;
+}
 

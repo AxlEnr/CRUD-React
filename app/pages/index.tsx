@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import Navbar from '../components/Navbar/Navbar';
 
@@ -23,6 +22,7 @@ export function Index() {
       });
     });
   }, []);
+
 
 
   return (
@@ -58,4 +58,3 @@ export function Index() {
 
   );
 }
-

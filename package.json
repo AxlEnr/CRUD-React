@@ -9,12 +9,18 @@
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {
+    "@radix-ui/react-slot": "^1.2.3",
     "@react-router/node": "^7.5.3",
     "@react-router/serve": "^7.5.3",
+    "class-variance-authority": "^0.7.1",
     "isbot": "^5.1.27",
+    "lucide-react": "^0.513.0",
+    "next": "^15.3.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-router": "^7.5.3"
+    "react-router": "^7.5.3",
+    "sweetalert2": "^11.22.0",
+    "tailwind-merge": "^3.3.0"
   },
   "devDependencies": {
     "@react-router/dev": "^7.5.3",

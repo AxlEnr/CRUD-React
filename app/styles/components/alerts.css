@@ -1,0 +1,29 @@
+.swal-popup {
+  background-color: var(--ivory-color);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+}
+
+.swal-title {
+  color: var(--primary-color);
+  font-family: var(--primary-font);
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.swal-confirm-btn {
+  background-color: var(--primary-color);
+  color: var(--ivory-color);
+  font-weight: bold;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.6rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.swal-confirm-btn:hover {
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+}
