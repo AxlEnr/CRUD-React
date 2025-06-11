@@ -153,9 +153,9 @@ const clearCart = () => {
         <div className="bg-amber-900 p-6 rounded-full mb-6">
           <ShoppingBag className="mx-auto h-16 w-16 text-amber-200" />
         </div>
-        <h1 className="font-serif text-4xl text-amber-100 font-medium mb-4">Your Cart is Empty</h1>
+        <h1 className="font-serif text-4xl text-amber-100 font-medium mb-4">Tu Carrito esta vacio</h1>
         <p className="text-lg text-amber-100 mb-8 max-w-md">
-          Your luxury fragrance journey hasn't started yet. Discover our exquisite collection of perfumes.
+          Descubre nuestra Gran Coleccion de Perfumes.
         </p>
         <Button size="lg" className="bg-amber-600 hover:bg-amber-700 text-gray-900 font-medium">
           <Link to="/home">Explore Collections</Link>
@@ -214,7 +214,7 @@ const clearCart = () => {
                     </button>
                   </div>
                   <button className="text-amber-400 hover:text-amber-300 text-sm font-medium flex items-center">
-                    <Trash2 className="mr-1 h-4 w-4" /> Remove
+                    <Trash2 className="mr-1 h-4 w-4" /> Quitar
                   </button>
                 </div>
               </div>
@@ -224,7 +224,7 @@ const clearCart = () => {
 
         <Card className="lg:col-span-1 sticky top-24 border border-amber-800 bg-gray-800 shadow-lg">
           <CardHeader className="border-b border-amber-800">
-            <CardTitle className="font-serif text-2xl text-amber-100 font-medium">Order Summary</CardTitle>
+            <CardTitle className="font-serif text-2xl text-amber-100 font-medium">Total de compra</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 py-6">
             <div className="flex justify-between text-base">
@@ -232,12 +232,12 @@ const clearCart = () => {
               <span className="font-medium text-amber-100">${total.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-sm text-amber-200">
-              <span>Shipping</span>
-              <span>Free</span>
+              <span>Envio</span>
+              <span>Gratis</span>
             </div>
             <div className="flex justify-between text-sm text-amber-200">
-              <span>Taxes</span>
-              <span>Calculated at checkout</span>
+              <span>Impuestos</span>
+              <span>No</span>
             </div>
             <hr className="my-4 border-amber-800" />
             <div className="flex justify-between text-lg font-medium">
@@ -248,7 +248,7 @@ const clearCart = () => {
           <CardFooter className="flex flex-col space-y-3 pt-0">
             <Link to="/checkout">
               <Button size="lg" className="w-full bg-amber-600 hover:bg-amber-500 text-gray-900 font-medium">
-                Proceed to Checkout <ArrowRight className="ml-2 h-5 w-5" />
+                Proceder con la compra <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
             <Button 
@@ -256,10 +256,10 @@ const clearCart = () => {
               onClick={clearCart} 
               className="w-full border-amber-600 text-amber-100 hover:bg-gray-700 font-medium"
             >
-              <Trash2 className="mr-2 h-4 w-4" /> Clear Cart
+              <Trash2 className="mr-2 h-4 w-4" /> Vaciar carrito
             </Button>
             <p className="text-center text-sm text-amber-200 mt-2">
-              Free shipping on all orders over $50
+              Envio gratis en compras mayores a $1000
             </p>
           </CardFooter>
         </Card>
