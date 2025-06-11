@@ -4,6 +4,7 @@ import { UserProfileCard } from './UserProfileCard';
 import { AddressCard } from './AddressCard';
 import { NewAddressForm } from './NewAddressForm';
 import type { Direccion, Usuario } from './profile/types';
+import Navbar from 'app/components/Navbar/Navbar';
 
 export default function Profile() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
@@ -166,38 +167,42 @@ export default function Profile() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12 space-y-8">
-      {/* Tarjeta de usuario */}
-      <UserProfileCard 
-        usuario={usuario} 
-        onUpdate={handleUpdateUser} 
-      />
+    <main>
+      <Navbar />
+      <div className="max-w-4xl mx-auto px-4 py-12 space-y-8">
+        {/* Tarjeta de usuario */}
+        <UserProfileCard 
+          usuario={usuario} 
+          onUpdate={handleUpdateUser} 
+        />
 
-      {/* Tarjeta de direcciones */}
-      <Card className="bg-gray-800 border border-amber-700 text-amber-100 shadow-lg">
-        <div className="p-6">
-          <h2 className="text-3xl font-serif mb-6">Mis Direcciones</h2>
-          
-          {direcciones.length === 0 ? (
-            <div className="text-center py-4 text-amber-300">
-              No tienes direcciones registradas
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {direcciones.map(direccion => (
-                <AddressCard
-                  key={direccion.id}
-                  direccion={direccion}
-                  onEdit={handleUpdateDireccion}
-                  onDelete={handleDeleteDireccion}
-                />
-              ))}
-            </div>
-          )}
-          
-          <NewAddressForm onCreate={handleCreateDireccion} />
-        </div>
-      </Card>
-    </div>
+        {/* Tarjeta de direcciones */}
+        <Card className="bg-gray-800 border border-amber-700 text-amber-100 shadow-lg">
+          <div className="p-6">
+            <h2 className="text-3xl font-serif mb-6">Mis Direcciones</h2>
+            
+            {direcciones.length === 0 ? (
+              <div className="text-center py-4 text-amber-300">
+                No tienes direcciones registradas
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {direcciones.map(direccion => (
+                  <AddressCard
+                    key={direccion.id}
+                    direccion={direccion}
+                    onEdit={handleUpdateDireccion}
+                    onDelete={handleDeleteDireccion}
+                  />
+                ))}
+              </div>
+            )}
+            
+            <NewAddressForm onCreate={handleCreateDireccion} />
+          </div>
+        </Card>
+      </div>
+    </main>
+
   );
 }
