@@ -2,7 +2,6 @@ import Navbar from 'app/components/Navbar/Navbar';
 import { useEffect } from 'react';
 
 
-
 export function Index() {
   useEffect(() => {
     const containers = document.querySelectorAll('.video-container');
@@ -65,7 +64,6 @@ export function Index() {
   */
 return (
     <main>
-      <Navbar />
       <section className="video-section">
         <div className="logo-image">
           <img 

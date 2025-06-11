@@ -20,6 +20,7 @@ export function LoginUser(){
 
             localStorage.setItem("token", result.token);
             localStorage.setItem("rol", result.user.rol);
+            localStorage.setItem("userId", result.user.id);
 
             setLoginUser({
                 email: '',

@@ -8,6 +8,7 @@ const routes = [
   route("/register", "routes/shared/registerUser.routes.tsx"),
   route("/login", "routes/shared/loginUser.routes.tsx"),
   route("/usuarios", "routes/usuarios.tsx"),
+  route("/profile", "routes/profile.route.tsx"),
   route("/productos", "routes/productos.tsx"),
 
 ] satisfies RouteConfigEntry[];

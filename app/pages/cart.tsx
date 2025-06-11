@@ -1,64 +1,151 @@
-'use client';
+import { useEffect, useState } from 'react';
 import { Button } from '../styles/components/button';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../styles/components/card';
 import { ShoppingBag, ArrowRight, Trash2, Plus, Minus } from 'lucide-react';
 
-// Datos estáticos de ejemplo
-const staticCartItems = [
-  {
-    perfume: {
-      id: 1,
-      name: "Eau de Luxe Homme",
-      price: 89.99,
-      image: "/assets/imgs/Dior.jpg",
-      description: "Una fragancia masculina sofisticada con notas de madera y especias",
-      size: "100ml"
-    },
-    quantity: 2
-  },
-  {
-    perfume: {
-      id: 2,
-      name: "Eau de Luxe Femme",
-      price: 94.99,
-      image: "/assets/imgs/Dior.jpg",
-      description: "Una fragancia femenina elegante con notas florales y cítricas",
-      size: "100ml"
-    },
-    quantity: 1
-  },
-  {
-    perfume: {
-      id: 3,
-      name: "Eau de Luxe Femme",
-      price: 94.99,
-      image: "/assets/imgs/Dior.jpg",
-      description: "Una fragancia femenina elegante con notas florales y cítricas",
-      size: "100ml"
-    },
-    quantity: 1
-  }
-];
+// Define the Detalle type based on expected API response structure
+interface Detalle {
+  cantidad: number;
+  producto: {
+    id: number;
+    nombre: string;
+    precio: string | number;
+    imagen_url: string;
+    descripcion: string;
+    capacidad: string | number;
+  };
+}
 
-// Funciones estáticas de ejemplo
-const getCartTotal = () => {
-  return staticCartItems.reduce((total, item) => total + (item.perfume.price * item.quantity), 0);
-};
-
-const getItemCount = () => {
-  return staticCartItems.reduce((count, item) => count + item.quantity, 0);
-};
-
-const clearCart = () => {
-  console.log("Cart cleared");
-  alert("Cart has been cleared (this is a static example)");
-};
+// Define the CartItem type for items in the cart
+interface CartItem {
+  perfume: {
+    id: number;
+    name: string;
+    price: number;
+    image: string;
+    description: string;
+    size: string;
+  };
+  quantity: number;
+}
 
 export default function CartPage() {
-  const cartItems = staticCartItems;
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+    const apiUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      console.error('User ID not found in localStorage');
+      setLoading(false);
+      return;
+    } 
+
+    fetch(`${apiUrl}/carrito/usuario/${userId}`)
+      .then(res => res.json())
+      .then(data => {
+        const items = data.detalles.map((detalle: Detalle) => ({
+          perfume: {
+            id: detalle.producto.id,
+            name: detalle.producto.nombre,
+            price: parseFloat(detalle.producto.precio as string),
+            iimage: `/assets/imgs/${detalle.producto.imagen_url}`, 
+            description: detalle.producto.descripcion,
+            size: `${detalle.producto.capacidad} GB`,
+          },
+          quantity: detalle.cantidad
+        }));
+        setCartItems(items);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Error fetching cart:', err);
+        setLoading(false);
+      });
+  }, []);
+
+
+  const getCartTotal = () => {
+    return cartItems.reduce((total, item) => total + (item.perfume.price * item.quantity), 0);
+  };
+
+  const getItemCount = () => {
+    return cartItems.reduce((count, item) => count + item.quantity, 0);
+  };
+
+  const updateCartItemQuantity = (
+  cartId: number,
+  productId: number,
+  newQuantity: number
+) => {
+  const apiUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
+  const userId = localStorage.getItem('userId');
+  if (!userId) {
+    alert('User ID not found');
+    return;
+  }
+
+  fetch(`${apiUrl}/carrito/usuario/${userId}/${cartId}/producto/${productId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ cantidad: newQuantity }),
+  })
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error('Error al actualizar cantidad');
+      }
+      // Actualizar localmente el estado
+      setCartItems((prevItems) =>
+        prevItems.map((item) =>
+          item.perfume.id === productId
+            ? { ...item, quantity: newQuantity }
+            : item
+        )
+      );
+    })
+    .catch((err) => {
+      console.error('Error al actualizar cantidad:', err);
+      alert('No se pudo actualizar la cantidad');
+    });
+};
+
+
+const clearCart = () => {
+  const apiUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
+  const userId = localStorage.getItem('userId');
+  if (!userId) {
+    alert('User ID not found');
+    return;
+  }
+
+  fetch(`${apiUrl}/carrito/usuario/${userId}/vaciar`, {
+    method: 'DELETE',
+  })
+    .then(res => {
+      if (!res.ok) {
+        throw new Error('Error al vaciar el carrito');
+      }
+      // Vaciar estado local también
+      setCartItems([]);
+      alert('Carrito vaciado con éxito');
+    })
+    .catch(err => {
+      console.error('Error al vaciar el carrito:', err);
+      alert('Hubo un error al vaciar el carrito');
+    });
+};
+
+
   const total = getCartTotal();
   const itemCount = getItemCount();
+
+  if (loading) {
+    return <div className="text-center py-20 text-amber-100">Loading...</div>;
+  }
 
   if (itemCount === 0) {
     return (
@@ -71,7 +158,7 @@ export default function CartPage() {
           Your luxury fragrance journey hasn't started yet. Discover our exquisite collection of perfumes.
         </p>
         <Button size="lg" className="bg-amber-600 hover:bg-amber-700 text-gray-900 font-medium">
-          <Link href="/perfumes">Explore Collections</Link>
+          <Link to="/home">Explore Collections</Link>
         </Button>
       </div>
     );
@@ -107,11 +194,22 @@ export default function CartPage() {
                 
                 <div className="flex items-center justify-between mt-4">
                   <div className="flex items-center border border-amber-700 rounded-full bg-gray-700">
-                    <button className="p-2 text-amber-200 hover:text-amber-100">
+                    <button
+                      className="p-2 text-amber-200 hover:text-amber-100"
+                      onClick={() =>
+                        item.quantity > 1 &&
+                        updateCartItemQuantity(1, item.perfume.id, item.quantity - 1)
+                      }
+                    >
                       <Minus className="h-4 w-4" />
                     </button>
                     <span className="px-4 text-amber-100 font-medium">{item.quantity}</span>
-                    <button className="p-2 text-amber-200 hover:text-amber-100">
+                    <button
+                      className="p-2 text-amber-200 hover:text-amber-100"
+                      onClick={() =>
+                        updateCartItemQuantity(1, item.perfume.id, item.quantity + 1)
+                      }
+                    >
                       <Plus className="h-4 w-4" />
                     </button>
                   </div>
@@ -148,11 +246,11 @@ export default function CartPage() {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-3 pt-0">
-            <Button size="lg" className="w-full bg-amber-600 hover:bg-amber-500 text-gray-900 font-medium" asChild>
-              <Link href="/checkout" className="flex items-center justify-center">
+            <Link to="/checkout">
+              <Button size="lg" className="w-full bg-amber-600 hover:bg-amber-500 text-gray-900 font-medium">
                 Proceed to Checkout <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
+              </Button>
+            </Link>
             <Button 
               variant="outline" 
               onClick={clearCart} 
