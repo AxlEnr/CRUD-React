@@ -42,7 +42,7 @@ export function OrdenesPage() {
   const [error, setError] = useState<string | null>(null);
 
   // IDs de órdenes a consultar
-  const ordenesIds = [6, 7, 8, 9];
+  const ordenesIds = [1,2,3,4,5,6, 7, 8, 9];
 
   const obtenerDetallesOrdenes = async () => {
     setLoading(true);
