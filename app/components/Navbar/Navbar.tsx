@@ -46,10 +46,10 @@ function Navbar() {
               <a href="/home" className="py-4 px-3 navbar-href">
                 Inicio
               </a>
-              <a href="#" className="py-4 px-3 navbar-href">
+              <a href="/contact" className="py-4 px-3 navbar-href">
                 Contacto
               </a>
-              <a href="#" className="py-4 px-3 navbar-href">
+              <a href="/aboutus" className="py-4 px-3 navbar-href">
                 Acerca de
               </a>
               {token ? (

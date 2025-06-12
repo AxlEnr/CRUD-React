@@ -7,8 +7,12 @@ const routes = [
   route("/home", "routes/home2.routes.tsx"),
   route("/register", "routes/shared/registerUser.routes.tsx"),
   route("/login", "routes/shared/loginUser.routes.tsx"),
+  route("/forgot-password", "routes/shared/recuperarPassword.tsx"),
   route("/usuarios", "routes/usuarios.tsx"),
   route("/productos", "routes/productos.tsx"),
+  route("/contact", "routes/contacto.tsx"),
+  route("/aboutus", "routes/nosotros.tsx"),
+  
 
 ] satisfies RouteConfigEntry[];
 
