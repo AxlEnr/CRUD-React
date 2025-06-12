@@ -1,8 +1,10 @@
+import { countOrders } from 'app/services/orderService';
 import React, { useEffect, useState } from 'react';
 function Navbar() {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [cart, setCart] = useState<number>();
 
 
   useEffect(() => {
@@ -13,6 +15,15 @@ function Navbar() {
     setToken(storedToken);
   }, []);
 
+    useEffect(() => {
+      const fetchData = async () => {
+        const data = await countOrders();
+        console.log(data);
+        setCart(data);
+      }
+      fetchData();
+    
+  }, []);
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!isMobileMenuOpen);
@@ -26,6 +37,7 @@ function Navbar() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("rol");
+    localStorage.removeItem("userId");
 
     setToken(null);
     setUserRole(null);
@@ -37,7 +49,11 @@ function Navbar() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex justify-between">
             <div className="flex items-center py-4">
-              <h1 className="text-2xl font-bold nb-name">Nombre del e-commerce</h1>
+                    <img 
+                  src="/assets/imgs/maeka2.png" 
+                  className="background-image w-22.5" 
+                  alt="logo"
+              />
             </div>
             
             
@@ -55,8 +71,6 @@ function Navbar() {
               {token ? (
                 <>
 
-                  <a href="#" className="py-4 px-3 navbar-href">Ajustes</a>
-
                   <div className="relative group">
                     <button className="py-4 px-3 flex items-center transition duration-300 dropdown">
                       <span>Mi cuenta</span>
@@ -65,14 +79,43 @@ function Navbar() {
                       </svg>
                     </button>
                     <div className="absolute right-0 mt-0 w-48  rounded-md shadow-lg py-1 z-10 hidden group-hover:block dropdown-menu">
-                      <a href="#" className="block px-4 py-2 text-gray-700 dropdown-select">Mis Compras</a>
-                      <a href="#" className="block px-4 py-2 text-gray-700 dropdown-select">Mi perfil</a>
+                      <a href="/checkout" className="block px-4 py-2 text-gray-700 dropdown-select">Mis Compras</a>
+                      <a href="/profile" className="block px-4 py-2 text-gray-700 dropdown-select">Mi perfil</a>
                       <a href="#" className="block px-4 py-2 text-gray-700 dropdown-select" onClick={handleLogout}>Cerrar Sesión</a>
                       {userRole === "admin" && (
-                        <a href="#" className="block px-4 py-2 text-gray-700 dropdown-select">Panel de Control</a>
+                        <a href="/usuarios" className="block px-4 py-2 text-gray-700 dropdown-select">Panel de Control</a>
                       )}
+                    </div> 
+                  </div>  
+                  <a
+                    href="/cart"
+                    className="group p-2  hover:text-gray-900 transition-colors"
+                  >
+                    <div className="relative">
+                      <svg
+                        className="w-7 h-7  group-hover:text-amber-500 transition-colors duration-200"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M6.29977 5H21L19 12H7.37671M20 16H8L6 3H3M9 20C9 20.5523 8.55228 21 8 21C7.44772 21 7 20.5523 7 20C7 19.4477 7.44772 19 8 19C8.55228 19 9 19.4477 9 20ZM20 20C20 20.5523 19.5523 21 19 21C18.4477 21 18 20.5523 18 20C18 19.4477 18.4477 19 19 19C19.5523 19 20 19.4477 20 20Z"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                      {(cart ?? 0) > 0 && (
+                        <span className="absolute text-[8px] -top-1 -right-2 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                          {cart}
+                        </span>
+                      )}
+                        
                     </div>
-                  </div>
+
+                  </a>
+
                 </>
               ) : (
                 <a href="/login" className="py-4 px-3 navbar-href">Iniciar Sesión</a>
@@ -96,9 +139,9 @@ function Navbar() {
           <ul className="">
             {token ? (
               <>
-                <li><a href="#" className="block px-4 py-2 text-sm navbar-href">Ajustes</a></li>
-                <li><a href="#" className="block px-4 py-2 text-sm navbar-href">Mis Compras</a></li>
-                <li><a href="#" className="block px-4 py-2 text-sm navbar-href">Mi perfil</a></li>
+                <li><a href="/checkout" className="block px-4 py-2 text-sm navbar-href">Mis Compras</a></li>
+                <li><a href="/profile" className="block px-4 py-2 text-sm navbar-href">Mi perfil</a></li>
+                <li><a href="/cart" className="block px-4 py-2 text-sm navbar-href">Carrito({cart})</a></li>
                 {userRole === "admin" && (
                   <li><a href="#" className="block px-4 py-2 text-sm navbar-href">Panel de Control</a></li>
                 )}
