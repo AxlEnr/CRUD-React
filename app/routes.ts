@@ -14,6 +14,7 @@ const routes = [
   route("/contact", "routes/contacto.tsx"),//PUBLICA
   route("/aboutus", "routes/nosotros.tsx"),//PUBLICA
   route('/checkout', 'routes/user/checkout.routes.tsx'),
+  route("/catalogo", "routes/catalogo.routes.tsx"),
 
 
   route("/home", "routes/home2.routes.tsx"),
