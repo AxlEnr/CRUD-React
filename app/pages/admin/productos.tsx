@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
-import Dashboard from "app/components/Dashboard/Dashboard";
-import Navbar from "app/components/Navbar/Navbar";
+
 interface Producto {
   id: number;
   nombre: string;
   descripcion: string;
-  precio: string; // como string para inputs
+  precio: string;
   stock: number;
   marca: string;
   capacidad: number;
@@ -16,16 +15,15 @@ interface Producto {
 
 export function ProductosPage() {
   const [productos, setProductos] = useState<Producto[]>([]);
+  const [productosOriginales, setProductosOriginales] = useState<Producto[]>([]); // Para mantener copia de todos los productos
   const [formVisible, setFormVisible] = useState(false);
   const [productoActual, setProductoActual] = useState<Producto | null>(null);
   const [mensajeAlerta, setMensajeAlerta] = useState<string | null>(null);
   const [tipoAlerta, setTipoAlerta] = useState<"success" | "error">("success");
-
-
   const [productoParaEliminar, setProductoParaEliminar] = useState<Producto | null>(null);
+  const [busqueda, setBusqueda] = useState("");
 
-  const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sIjoiYWRtaW4iLCJpYXQiOjE3NDk0Mjk1MzksImV4cCI6MTc0OTYwMjMzOX0.MyQ-1N8dFDrVcfi0SoEcSOhcyRH8outSdYeSvWyG-pA";
+  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sIjoiYWRtaW4iLCJpYXQiOjE3NDk0Mjk1MzksImV4cCI6MTc0OTYwMjMzOX0.MyQ-1N8dFDrVcfi0SoEcSOhcyRH8outSdYeSvWyG-pA";
 
   useEffect(() => {
     fetch("http://localhost:8080/api/productos/todo")
@@ -37,15 +35,31 @@ export function ProductosPage() {
         const productos = Array.isArray(data)
           ? data
           : Array.isArray(data.productos)
-          ? data.productos
-          : [];
+            ? data.productos
+            : [];
         setProductos(productos);
+        setProductosOriginales(productos); // Guardamos copia de todos los productos
       })
       .catch(() => {
         setProductos([]);
         mostrarAlerta("Error al cargar productos.", "error");
       });
   }, []);
+
+  // Efecto para filtrar productos según la búsqueda
+  useEffect(() => {
+    if (busqueda.trim() === "") {
+      setProductos(productosOriginales);
+    } else {
+      const resultados = productosOriginales.filter(
+        (producto) =>
+          producto.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
+          producto.marca.toLowerCase().includes(busqueda.toLowerCase()) ||
+          producto.descripcion.toLowerCase().includes(busqueda.toLowerCase())
+      );
+      setProductos(resultados);
+    }
+  }, [busqueda, productosOriginales]);
 
   const mostrarAlerta = (mensaje: string, tipo: "success" | "error") => {
     setMensajeAlerta(mensaje);
@@ -60,16 +74,16 @@ export function ProductosPage() {
       producto
         ? { ...producto, precio: producto.precio.toString() }
         : {
-            id: 0,
-            nombre: "",
-            descripcion: "",
-            precio: "",
-            stock: 0,
-            marca: "",
-            capacidad: 0,
-            id_categoria: null,
-            imagen_url: "",
-          }
+          id: 0,
+          nombre: "",
+          descripcion: "",
+          precio: "",
+          stock: 0,
+          marca: "",
+          capacidad: 0,
+          id_categoria: null,
+          imagen_url: "",
+        }
     );
     setFormVisible(true);
   };
@@ -88,16 +102,16 @@ export function ProductosPage() {
     setProductoActual((prev) =>
       prev
         ? {
-            ...prev,
-            [name]:
-              name === "id_categoria"
-                ? value === ""
-                  ? null
-                  : Number(value)
-                : name === "stock" || name === "capacidad"
+          ...prev,
+          [name]:
+            name === "id_categoria"
+              ? value === ""
+                ? null
+                : Number(value)
+              : name === "stock" || name === "capacidad"
                 ? Number(value)
                 : value,
-          }
+        }
         : null
     );
   };
@@ -198,213 +212,103 @@ export function ProductosPage() {
     }
   };
 
-  return (
+  // ... (mantén todas tus funciones existentes como abrirFormulario, cerrarFormulario, etc.)
 
+  return (
     <div className="p-4 max-w-5xl mx-auto">
-      
+      {/* Barra de búsqueda */}
+      <div className="mb-6">
+        <div className="relative">
+          <input
+            type="text"
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            placeholder="Buscar productos por nombre, marca o descripción..."
+            className="w-full p-3 pl-10 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
+      </div>
 
       {mensajeAlerta && (
         <div
-          className={`mb-4 p-3 rounded ${
-            tipoAlerta === "success"
+          className={`mb-4 p-3 rounded ${tipoAlerta === "success"
               ? "bg-green-100 text-green-700"
               : "bg-red-100 text-red-700"
-          }`}
+            }`}
         >
           {mensajeAlerta}
         </div>
       )}
 
-      <button
-        onClick={() => abrirFormulario(null)}
-        className="mb-4 px-4 py-2 bg-blue-600 text-white rounded"
-      >
-        Agregar Producto
-      </button>
-
-      {formVisible && productoActual && (
-        <form
-          onSubmit={manejarSubmit}
-          className="border p-4 rounded mb-4 shadow"
-          key={productoActual.id}
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">Gestión de Productos</h1>
+        <button
+          onClick={() => abrirFormulario(null)}
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
         >
-          <h2 className="text-lg font-semibold mb-3">
-            {productoActual.id !== 0 ? "Editar Producto" : "Nuevo Producto"}
-          </h2>
-
-          <input
-            type="text"
-            name="nombre"
-            placeholder="Nombre"
-            value={productoActual.nombre}
-            onChange={manejarCambio}
-            className="border p-2 w-full mb-2 rounded"
-            required
-          />
-
-          <textarea
-            name="descripcion"
-            placeholder="Descripción"
-            value={productoActual.descripcion}
-            onChange={manejarCambio}
-            className="border p-2 w-full mb-2 rounded"
-            required
-          />
-
-          <input
-            type="text"
-            name="precio"
-            placeholder="Precio"
-            value={productoActual.precio}
-            onChange={manejarCambio}
-            className="border p-2 w-full mb-2 rounded"
-            required
-          />
-
-          <input
-            type="number"
-            name="stock"
-            placeholder="Stock"
-            value={productoActual.stock}
-            onChange={manejarCambio}
-            className="border p-2 w-full mb-2 rounded"
-            required
-            min={0}
-          />
-
-          <input
-            type="text"
-            name="marca"
-            placeholder="Marca"
-            value={productoActual.marca}
-            onChange={manejarCambio}
-            className="border p-2 w-full mb-2 rounded"
-            required
-          />
-
-          <input
-            type="number"
-            name="capacidad"
-            placeholder="Capacidad (ml)"
-            value={productoActual.capacidad}
-            onChange={manejarCambio}
-            className="border p-2 w-full mb-2 rounded"
-            required
-            min={0}
-          />
-
-          <input
-            type="number"
-            name="id_categoria"
-            placeholder="ID Categoría"
-            value={productoActual.id_categoria ?? ""}
-            onChange={manejarCambio}
-            className="border p-2 w-full mb-2 rounded"
-          />
-
-          <input
-            type="text"
-            name="imagen_url"
-            placeholder="URL de Imagen"
-            value={productoActual.imagen_url}
-            onChange={manejarCambio}
-            className="border p-2 w-full mb-2 rounded"
-            required
-          />
-
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              className="px-4 py-2 bg-green-600 text-white rounded"
-            >
-              Guardar
-            </button>
-            <button
-              type="button"
-              onClick={cerrarFormulario}
-              className="px-4 py-2 bg-gray-500 text-white rounded"
-            >
-              Cancelar
-            </button>
-          </div>
-        </form>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {productos.map((producto) => (
-          <div
-            key={producto.id}
-            className="border rounded-lg p-3 shadow-sm relative"
-          >
-            <img
-              src={producto.imagen_url}
-              alt={producto.nombre}
-              className="w-full h-auto max-h-70 rounded"
-            />
-            <h2 className="text-md font-semibold mt-2">{producto.nombre}</h2>
-            <p className="text-xs text-gray-600 truncate">
-              {producto.descripcion}
-            </p>
-            <p className="text-xs mt-1">Marca: {producto.marca}</p>
-            <p className="text-xs">Capacidad: {producto.capacidad}ml</p>
-            <p className="text-xs">Stock: {producto.stock}</p>
-            <p className="text-sm font-bold mt-1">${producto.precio}</p>
-
-            <div className="mt-2 flex gap-2">
-              <button
-                onClick={() => abrirFormulario(producto)}
-                className="px-3 py-1 bg-yellow-500 rounded text-white text-xs"
-              >
-                Editar
-              </button>
-              <button
-                onClick={() => solicitarEliminarProducto(producto)}
-                className="px-3 py-1 bg-red-600 rounded text-white text-xs"
-              >
-                Eliminar
-              </button>
-            </div>
-          </div>
-        ))}
+          Agregar Producto
+        </button>
       </div>
 
-      {/* Modal de confirmación */}
-      {productoParaEliminar && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-          role="dialog"
-          aria-modal="true"
-        >
-        <div className="bg-blue-950 text-white rounded p-6 max-w-sm w-full shadow-lg">
+      {/* ... (mantén el resto de tu JSX existente, como el formulario, la lista de productos y el modal de confirmación) */}
 
-
-
-            <h3 className="text-lg font-semibold mb-4">
-              Confirmar Eliminación
-            </h3>
-            <p className="mb-4">
-              ¿Seguro que quieres eliminar el producto{" "}
-              <strong>{productoParaEliminar.nombre}</strong>?
-            </p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={cancelarEliminar}
-                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={confirmarEliminar}
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-              >
-                Eliminar
-              </button>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {productos.length > 0 ? (
+          productos.map((producto) => (
+            <div
+              key={producto.id}
+              className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
+            >
+              <img
+                src={producto.imagen_url}
+                alt={producto.nombre}
+                className="w-full h-48 object-cover rounded mb-3"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300';
+                }}
+              />
+              <h2 className="text-lg font-semibold">{producto.nombre}</h2>
+              <p className="text-sm text-gray-600 line-clamp-2 my-2">
+                {producto.descripcion}
+              </p>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <p><span className="font-medium">Marca:</span> {producto.marca}</p>
+                <p><span className="font-medium">Capacidad:</span> {producto.capacidad}ml</p>
+                <p><span className="font-medium">Stock:</span> {producto.stock}</p>
+                <p><span className="font-medium">Precio:</span> ${producto.precio}</p>
+              </div>
+              <div className="mt-4 flex gap-2">
+                <button
+                  onClick={() => abrirFormulario(producto)}
+                  className="px-3 py-1 bg-yellow-500 rounded text-white text-sm hover:bg-yellow-600 transition-colors"
+                >
+                  Editar
+                </button>
+                <button
+                  onClick={() => solicitarEliminarProducto(producto)}
+                  className="px-3 py-1 bg-red-600 rounded text-white text-sm hover:bg-red-700 transition-colors"
+                >
+                  Eliminar
+                </button>
+              </div>
             </div>
+          ))
+        ) : (
+          <div className="col-span-full text-center py-8">
+            <p className="text-gray-500">
+              {busqueda ? "No se encontraron productos que coincidan con tu búsqueda" : "No hay productos disponibles"}
+            </p>
           </div>
-        </div>
-      )}
+        )}
+      </div>
+
+      {/* Modal de confirmación y formulario (mantén tu código existente) */}
+      {/* ... */}
     </div>
   );
 }
-
-

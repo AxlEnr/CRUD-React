@@ -9,15 +9,21 @@ export function UsuariosPage() {
   const [usuarios, setUsuarios] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
 
+  // Obtener token desde localStorage solo en cliente
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      setToken(storedToken);
+    }
+  }, []);
 
-
-  const obtenerUsuarios = async () => {
+  const obtenerUsuarios = async (token: string) => {
     setLoading(true);
     setError(null);
 
     try {
-      const token = localStorage.getItem("token");
       const res = await fetch(`${apiUrl}/users`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -33,9 +39,12 @@ export function UsuariosPage() {
     }
   };
 
+  // Cuando ya haya token, obtener usuarios
   useEffect(() => {
-    obtenerUsuarios();
-  }, []);
+    if (token) {
+      obtenerUsuarios(token);
+    }
+  }, [token]);
 
   return (
     <main className="usuarios-container">
