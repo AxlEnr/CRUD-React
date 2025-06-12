@@ -4,6 +4,7 @@ import { getEnviroments } from "app/envs/getEnvs";
 import Dashboard from "app/components/Dashboard/Dashboard";
 import Navbar from "app/components/Navbar/Navbar";
 
+
 interface Producto {
   id: number;
   nombre: string;
@@ -18,6 +19,7 @@ interface Producto {
 
 export function ProductosPage() {
   const [productos, setProductos] = useState<Producto[]>([]);
+  const [productosOriginales, setProductosOriginales] = useState<Producto[]>([]); // Para mantener copia de todos los productos
   const [formVisible, setFormVisible] = useState(false);
   const [productoActual, setProductoActual] = useState<Producto | null>(null);
   const [mensajeAlerta, setMensajeAlerta] = useState<string | null>(null);
@@ -34,6 +36,7 @@ export function ProductosPage() {
   };
 
   const token = getToken();
+  const [busqueda, setBusqueda] = useState("");
 
   useEffect(() => {
     fetch(`${apiUrl}api/productos/todo`)
@@ -45,15 +48,31 @@ export function ProductosPage() {
         const productos = Array.isArray(data)
           ? data
           : Array.isArray(data.productos)
-          ? data.productos
-          : [];
+            ? data.productos
+            : [];
         setProductos(productos);
+        setProductosOriginales(productos); // Guardamos copia de todos los productos
       })
       .catch(() => {
         setProductos([]);
         mostrarAlerta("Error al cargar productos.", "error");
       });
   }, [apiUrl]);
+
+  // Efecto para filtrar productos según la búsqueda
+  useEffect(() => {
+    if (busqueda.trim() === "") {
+      setProductos(productosOriginales);
+    } else {
+      const resultados = productosOriginales.filter(
+        (producto) =>
+          producto.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
+          producto.marca.toLowerCase().includes(busqueda.toLowerCase()) ||
+          producto.descripcion.toLowerCase().includes(busqueda.toLowerCase())
+      );
+      setProductos(resultados);
+    }
+  }, [busqueda, productosOriginales]);
 
   const mostrarAlerta = (mensaje: string, tipo: "success" | "error") => {
     setMensajeAlerta(mensaje);
@@ -66,16 +85,16 @@ export function ProductosPage() {
       producto
         ? { ...producto, precio: producto.precio.toString() }
         : {
-            id: 0,
-            nombre: "",
-            descripcion: "",
-            precio: "",
-            stock: 0,
-            marca: "",
-            capacidad: 0,
-            id_categoria: null,
-            imagen_url: "",
-          }
+          id: 0,
+          nombre: "",
+          descripcion: "",
+          precio: "",
+          stock: 0,
+          marca: "",
+          capacidad: 0,
+          id_categoria: null,
+          imagen_url: "",
+        }
     );
     setFormVisible(true);
   };
@@ -93,16 +112,16 @@ export function ProductosPage() {
     setProductoActual((prev) =>
       prev
         ? {
-            ...prev,
-            [name]:
-              name === "id_categoria"
-                ? value === ""
-                  ? null
-                  : Number(value)
-                : name === "stock" || name === "capacidad"
+          ...prev,
+          [name]:
+            name === "id_categoria"
+              ? value === ""
+                ? null
+                : Number(value)
+              : name === "stock" || name === "capacidad"
                 ? Number(value)
                 : value,
-          }
+        }
         : null
     );
   };

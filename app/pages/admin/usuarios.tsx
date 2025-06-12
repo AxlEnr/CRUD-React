@@ -11,13 +11,14 @@ export function UsuariosPage() {
   const [usuarios, setUsuarios] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+
 
   const obtenerUsuarios = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      const token = localStorage.getItem("token");
       const res = await fetch(`${apiUrl}/users`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -33,9 +34,12 @@ export function UsuariosPage() {
     }
   };
 
+  // Cuando ya haya token, obtener usuarios
   useEffect(() => {
-    obtenerUsuarios();
-  }, []);
+    if (token) {
+      obtenerUsuarios(token);
+    }
+  }, [token]);
 
   return (
     <div className="layout">
