@@ -4,19 +4,9 @@ import { motion } from 'framer-motion';
 import { FaShoppingCart } from 'react-icons/fa';
 
 import { getEnviroments } from "app/envs/getEnvs";
-const apiUrl = getEnviroments().apiUrl;
+import type { Producto } from "app/interfaces/users.interface/productos";
 
-interface Producto {
-  id: number;
-  nombre: string;
-  descripcion: string;
-  precio: string;
-  stock: number;
-  marca: string;
-  capacidad: number;
-  id_categoria: number | null;
-  imagen_url: string;
-}
+const apiUrl = getEnviroments().apiUrl;
 
 interface CarritoItem extends Producto {
   cantidad: number;
