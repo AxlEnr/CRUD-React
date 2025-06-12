@@ -39,7 +39,7 @@ export function ProductosPage() {
   const [busqueda, setBusqueda] = useState("");
 
   useEffect(() => {
-    fetch(`${apiUrl}api/productos/todo`)
+    fetch(`${apiUrl}/productos/todo`)
       .then((res) => {
         if (!res.ok) throw new Error("Error al obtener productos");
         return res.json();
@@ -134,8 +134,8 @@ export function ProductosPage() {
       productoActual.id && productoActual.id !== 0 ? "PUT" : "POST";
     const url =
       metodo === "PUT"
-        ? `${apiUrl}api/productos/actualizar/${productoActual.id}`
-        : `${apiUrl}api/productos/crear`;
+        ? `${apiUrl}productos/actualizar/${productoActual.id}`
+        : `${apiUrl}productos/crear`;
 
     const precioNumerico = Number(productoActual.precio);
 
@@ -190,7 +190,7 @@ export function ProductosPage() {
 
     try {
       const res = await fetch(
-        `${apiUrl}api/productos/eliminar/${productoParaEliminar.id}`,
+        `${apiUrl}/productos/eliminar/${productoParaEliminar.id}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },

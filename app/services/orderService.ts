@@ -50,9 +50,10 @@ export const countOrders = async () => {
 
   if (!response.ok) throw new Error(`${response.status}`);
 
-  const data = await response.json();
+const data = await response.json();
 
-  const detallesCount = data.detalles.length;
+const detallesCount = Array.isArray(data.detalles) ? data.detalles.length : 0;
 
-  return detallesCount;
+return detallesCount;
+
 };
