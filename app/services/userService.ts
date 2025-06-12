@@ -19,7 +19,6 @@ export const createUserApi = async (user: User): Promise<User> => {
     body: JSON.stringify(user),
   });
 
-  console.log(response)
   if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
 
   return response.json();
