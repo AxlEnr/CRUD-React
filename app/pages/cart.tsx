@@ -1,57 +1,56 @@
-  import { useEffect, useState } from 'react';
-  import { Button } from '../styles/components/button';
-  import { Link } from 'react-router-dom';
-  import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../styles/components/card';
-  import { ShoppingBag, ArrowRight, Trash2, Plus, Minus, Loader } from 'lucide-react';
-  import { getAdresses } from '../services/addressService';
-  import { createOrder } from 'app/services/orderService';
-  import type { Order } from 'app/interfaces/orders/order.interface';
-  import Swal from 'sweetalert2';
+import { useEffect, useState } from 'react';
+import { Button } from '../styles/components/button';
+import { Link } from 'react-router-dom';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../styles/components/card';
+import { ShoppingBag, ArrowRight, Trash2, Plus, Minus, Loader } from 'lucide-react';
+import { getAdresses } from '../services/addressService';
+import { createOrder } from 'app/services/orderService';
+import type { Order } from 'app/interfaces/orders/order.interface';
+import Swal from 'sweetalert2';
 import Navbar from 'app/components/Navbar/Navbar';
-  // Define the Detalle type based on expected API response structure
-  interface Detalle {
-    cantidad: number;
-    producto: {
-      id: number;
-      nombre: string;
-      precio: string | number;
-      imagen_url: string;
-      descripcion: string;
-      capacidad: string | number;
+
+interface Detalle {
+  cantidad: number;
+  producto: {
+    id: number;
+    nombre: string;
+    precio: string | number;
+    imagen_url: string;
+    descripcion: string;
+    capacidad: string | number;
+  };
+}
+
+interface CartItem {
+  cartId: number;
+  perfume: {
+    id: number;
+    name: string;
+    price: number;
+    image: string;
+    description: string;
+    size: string;
+  };
+  quantity: number;
+}
+
+export default function CartPage() {
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [address, setAddress] = useState<any[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState("");
+  const [order, setOrder] = useState<Order>({
+    id_direccion: 0,
+    items: [],
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getAdresses();
+      setAddress(data);
     };
-  }
-
-  // Define the CartItem type for items in the cart
-  interface CartItem {
-    perfume: {
-      id: number;
-      name: string;
-      price: number;
-      image: string;
-      description: string;
-      size: string;
-    };
-    quantity: number;
-  }
-
-  export default function CartPage() {
-    const [cartItems, setCartItems] = useState<CartItem[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [address, setAddress] = useState<any[]>([]);
-    const [selectedAddressId, setSelectedAddressId] = useState("");
-    const [order, setOrder] = useState<Order>({
-      id_direccion: 0,
-      items: [],
-    })
-
-      useEffect (() => {
-        const fetchData = async ( ) => {
-            const data = await getAdresses();
-            setAddress(data);
-          };
-          fetchData();
-      }, []);
-
+    fetchData();
+  }, []);
 
   const handleSubmit = async () => {
     if (!selectedAddressId) {
@@ -60,8 +59,8 @@ import Navbar from 'app/components/Navbar/Navbar';
         icon: 'warning',
         background: '#fffbe6',
         color: '#333',
-        timer: 2000, // ⏱️ duración en milisegundos
-        showConfirmButton: false, // 👋 oculta el botón
+        timer: 2000,
+        showConfirmButton: false,
         customClass: {
           popup: 'swal2-popup-custom',
           title: 'swal2-title-custom',
@@ -73,7 +72,6 @@ import Navbar from 'app/components/Navbar/Navbar';
           popup: 'animate__animated animate__fadeOut'
         }
       });
-
       return false;
     }
 
@@ -88,8 +86,6 @@ import Navbar from 'app/components/Navbar/Navbar';
       items: productos
     };
 
-    console.log(payload);
-
     try {
       await createOrder(payload);
       Swal.fire('¡Éxito!', 'Compra realizada con éxito', 'success');
@@ -100,52 +96,48 @@ import Navbar from 'app/components/Navbar/Navbar';
     }
   };
 
+  useEffect(() => {
+    const apiUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      console.error('User ID not found in localStorage');
+      setLoading(false);
+      return;
+    } 
 
-
-
-      useEffect(() => {
-      const apiUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
-      const userId = localStorage.getItem('userId');
-      if (!userId) {
-        console.error('User ID not found in localStorage');
+    fetch(`${apiUrl}/carrito/usuario/${userId}`)
+      .then(res => res.json())
+      .then(data => {
+        const items = data.detalles.map((detalle: Detalle) => ({
+          cartId: data.id,
+          perfume: {
+            id: detalle.producto.id,
+            name: detalle.producto.nombre,
+            price: parseFloat(detalle.producto.precio as string),
+            image: detalle.producto.imagen_url,
+            description: detalle.producto.descripcion,
+            size: `${detalle.producto.capacidad} GB`,
+          },
+          quantity: detalle.cantidad
+        }));
+        setCartItems(items);
         setLoading(false);
-        return;
-      } 
+      })
+      .catch(err => {
+        console.error('Error fetching cart:', err);
+        setLoading(false);
+      });
+  }, []);
 
-      fetch(`${apiUrl}/carrito/usuario/${userId}`)
-        .then(res => res.json())
-        .then(data => {
-          const items = data.detalles.map((detalle: Detalle) => ({
-            perfume: {
-              id: detalle.producto.id,
-              name: detalle.producto.nombre,
-              price: parseFloat(detalle.producto.precio as string),
-              image: `/assets/imgs/${detalle.producto.imagen_url}`, // ✅ Corregido aquí
-              description: detalle.producto.descripcion,
-              size: `${detalle.producto.capacidad} GB`,
-            },
-            quantity: detalle.cantidad
-          }));
+  const getCartTotal = () => {
+    return cartItems.reduce((total, item) => total + (item.perfume.price * item.quantity), 0);
+  };
 
-          setCartItems(items);
-          setLoading(false);
-        })
-        .catch(err => {
-          console.error('Error fetching cart:', err);
-          setLoading(false);
-        });
-    }, []);
+  const getItemCount = () => {
+    return cartItems.reduce((count, item) => count + item.quantity, 0);
+  };
 
-
-    const getCartTotal = () => {
-      return cartItems.reduce((total, item) => total + (item.perfume.price * item.quantity), 0);
-    };
-
-    const getItemCount = () => {
-      return cartItems.reduce((count, item) => count + item.quantity, 0);
-    };
-
-    const updateCartItemQuantity = (
+  const updateCartItemQuantity = (
     cartId: number,
     productId: number,
     newQuantity: number
@@ -168,7 +160,6 @@ import Navbar from 'app/components/Navbar/Navbar';
         if (!res.ok) {
           throw new Error('Error al actualizar cantidad');
         }
-        // Actualizar localmente el estado
         setCartItems((prevItems) =>
           prevItems.map((item) =>
             item.perfume.id === productId
@@ -183,6 +174,50 @@ import Navbar from 'app/components/Navbar/Navbar';
       });
   };
 
+  const removeFromCart = (cartId: number, productId: number) => {
+    const apiUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      alert('User ID not found');
+      return;
+    }
+
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: "¿Quieres eliminar este producto del carrito?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`${apiUrl}/carrito/usuario/${userId}/${cartId}/producto/${productId}`, {
+          method: 'DELETE',
+        })
+          .then((res) => {
+            if (!res.ok) {
+              throw new Error('Error al eliminar producto');
+            }
+            setCartItems(prevItems => prevItems.filter(item => item.perfume.id !== productId));
+            Swal.fire(
+              'Eliminado!',
+              'El producto ha sido eliminado del carrito.',
+              'success'
+            );
+          })
+          .catch((err) => {
+            console.error('Error al eliminar producto:', err);
+            Swal.fire(
+              'Error',
+              'No se pudo eliminar el producto del carrito',
+              'error'
+            );
+          });
+      }
+    });
+  };
 
   const clearCart = () => {
     const apiUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
@@ -192,36 +227,55 @@ import Navbar from 'app/components/Navbar/Navbar';
       return;
     }
 
-    fetch(`${apiUrl}/carrito/usuario/${userId}/vaciar`, {
-      method: 'DELETE',
-    })
-      .then(res => {
-        if (!res.ok) {
-          throw new Error('Error al vaciar el carrito');
-        }
-
-        setCartItems([]);
-      })
-      .catch(err => {
-        console.error('Error al vaciar el carrito:', err);
-        alert('Hubo un error al vaciar el carrito');
-      });
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: "¿Quieres vaciar completamente el carrito?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, vaciar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`${apiUrl}/carrito/usuario/${userId}/vaciar`, {
+          method: 'DELETE',
+        })
+          .then(res => {
+            if (!res.ok) {
+              throw new Error('Error al vaciar el carrito');
+            }
+            setCartItems([]);
+            Swal.fire(
+              'Vacío!',
+              'Tu carrito ha sido vaciado.',
+              'success'
+            );
+          })
+          .catch(err => {
+            console.error('Error al vaciar el carrito:', err);
+            Swal.fire(
+              'Error',
+              'Hubo un error al vaciar el carrito',
+              'error'
+            );
+          });
+      }
+    });
   };
 
+  const total = getCartTotal();
+  const itemCount = getItemCount();
 
-    const total = getCartTotal();
-    const itemCount = getItemCount();
+  if (loading) {
+    return <Loader />;
+  }
 
-    if (loading) {
-      return <Loader />;
-    }
-
-    if (itemCount === 0) {
-      return (
-        <main>
-          <Navbar />
-          <div className="min-h-[70vh] flex flex-col items-center justify-center text-center py-12 px-4 bg-gray-900">
-          
+  if (itemCount === 0) {
+    return (
+      <main>
+        <Navbar />
+        <div className="min-h-[70vh] flex flex-col items-center justify-center text-center py-12 px-4 bg-gray-900">
           <div className="bg-amber-900 p-6 rounded-full mb-6">
             <ShoppingBag className="mx-auto h-16 w-16 text-amber-200" />
           </div>
@@ -233,20 +287,14 @@ import Navbar from 'app/components/Navbar/Navbar';
             <Link to="/home">Explorar la tienda</Link>
           </Button>
         </div>
-        </main>
+      </main>
+    );
+  }
 
-      );
-    }
-
-
-
-
-
-    return (
-      <main>
-        <Navbar />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        
+  return (
+    <main>
+      <Navbar />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <h1 className="font-serif text-4xl text-amber-100 font-medium text-center mb-12">Carrito de compras</h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
@@ -296,7 +344,7 @@ import Navbar from 'app/components/Navbar/Navbar';
                     </div>
                     <button 
                       className="text-amber-400 hover:text-amber-300 text-sm font-medium flex items-center"
-                      onClick={() => updateCartItemQuantity(1, item.perfume.id, 0)} 
+                      onClick={() => removeFromCart(item.cartId, item.perfume.id)}
                     >
                       <Trash2 className="mr-1 h-4 w-4" /> Quitar
                     </button>
@@ -326,7 +374,6 @@ import Navbar from 'app/components/Navbar/Navbar';
                   ))}
                 </select>
               </div>
-
             </CardHeader>
             <CardContent className="space-y-4 py-6">
               <div className="flex justify-between text-base">
@@ -348,14 +395,13 @@ import Navbar from 'app/components/Navbar/Navbar';
               </div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-3 pt-0">
-
-                <Button size="lg" className="w-full bg-amber-600 hover:bg-amber-500 text-gray-900 font-medium"
-                onClick={() => {
-                  const success = handleSubmit();
-                  if (!success) clearCart();
-                }}>
-                  Proceder con la compra <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
+              <Button 
+                size="lg" 
+                className="w-full bg-amber-600 hover:bg-amber-500 text-gray-900 font-medium"
+                onClick={handleSubmit}
+              >
+                Proceder con la compra <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
 
               <Button 
                 variant="outline" 
@@ -371,7 +417,6 @@ import Navbar from 'app/components/Navbar/Navbar';
           </Card>
         </div>
       </div>
-      </main>
-
-    );
-  }
+    </main>
+  );
+}
