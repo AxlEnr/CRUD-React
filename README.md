@@ -3,42 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>README - Proyecto React Router con Vite</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      line-height: 1.6;
-      margin: 20px;
-      background-color: #f9f9f9;
-      color: #333;
-    }
-    h1, h2, h3 {
-      color: #2c3e50;
-    }
-    pre {
-      background: #2d2d2d;
-      color: #f8f8f2;
-      padding: 15px;
-      border-radius: 6px;
-      overflow-x: auto;
-    }
-    a {
-      color: #3498db;
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-    ul {
-      margin-left: 20px;
-    }
-    code {
-      background-color: #eee;
-      padding: 2px 5px;
-      border-radius: 4px;
-      font-family: monospace;
-    }
-  </style>
+  <h1>README - Proyecto React Router con Vite</h1>
+  
 </head>
 <body>
   <h1>Enlace del sitio web</h1>
