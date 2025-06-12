@@ -26,62 +26,53 @@ interface OrdenDetalle {
   producto: Producto;
 }
 
-interface OrdenConDetalles {
-  idOrden: number;
+interface Orden {
+  id: number;
+  id_usuario: number;
+  id_direccion: number;
+  fecha_creacion: string;
+  estado: string;
+  total: string;
   detalles: OrdenDetalle[];
 }
 
 export function OrdenesPage() {
   const apiUrlBase = getEnviroments().apiUrl;
-
-  // Normalizamos la URL base para que siempre termine en "/"
   const apiUrl = apiUrlBase.endsWith("/") ? apiUrlBase : apiUrlBase + "/";
 
-  const [ordenesConDetalles, setOrdenesConDetalles] = useState<OrdenConDetalles[]>([]);
+  const [ordenes, setOrdenes] = useState<Orden[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // IDs de órdenes a consultar
-  const ordenesIds = [1,2,3,4,5,6, 7, 8, 9];
-
-  const obtenerDetallesOrdenes = async () => {
+  const obtenerOrdenes = async () => {
     setLoading(true);
     setError(null);
 
     try {
       const token = localStorage.getItem("token");
 
-      const promesas = ordenesIds.map(async (idOrden) => {
-        const url = `${apiUrl}api/ordenesDetalles/detallesOrden/${idOrden}`;
-        const res = await fetch(url, {
-          headers: {
-            Authorization: `Bearer ${token ?? ""}`,
-          },
-        });
-
-        if (!res.ok) {
-          throw new Error(`Error al obtener detalles de la orden ${idOrden}: ${res.statusText}`);
-        }
-
-        const data: OrdenDetalle[] = await res.json();
-
-        return {
-          idOrden,
-          detalles: data,
-        };
+      const res = await fetch(`${apiUrl}ordenes/allOrdenes`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
-      const resultados = await Promise.all(promesas);
-      setOrdenesConDetalles(resultados);
+      if (!res.ok) {
+        throw new Error(`Error al obtener órdenes: ${res.statusText}`);
+      }
+
+      const data = await res.json();
+
+      setOrdenes(data);
     } catch (err: any) {
-      setError(err.message || "Error desconocido");
+      setError(err.message || "Error desconocido al obtener órdenes");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    obtenerDetallesOrdenes();
+    obtenerOrdenes();
   }, []);
 
   return (
@@ -90,19 +81,31 @@ export function OrdenesPage() {
       <div className="layout-body">
         <Dashboard />
         <main className="ordenes-container">
-          <h2>Órdenes con detalles</h2>
+          <h2>Historial de Órdenes</h2>
 
-          {!loading && !error && ordenesConDetalles.length > 0 ? (
-            ordenesConDetalles
-              .filter(({ detalles }) => detalles.length > 0) // Solo órdenes con detalles
-              .map(({ idOrden, detalles }) => (
-                <section key={idOrden} className="orden-detalle">
-                  <h3>Orden #{idOrden}</h3>
+          {loading ? (
+            <p className="loading">Cargando órdenes...</p>
+          ) : error ? (
+            <p className="error">{error}</p>
+          ) : ordenes.length === 0 ? (
+            <p>No se encontraron órdenes.</p>
+          ) : (
+            ordenes
+              .filter((orden) => orden.detalles && orden.detalles.length > 0)
+              .map((orden) => (
+                <section key={orden.id} className="orden-detalle">
+                  <div className="orden-header">
+                    <h3> Orden #{orden.id}</h3>
+                    <div className="orden-meta">
+                      <span>Fecha: {new Date(orden.fecha_creacion).toLocaleDateString()}</span>
+                      <span> Estado: {orden.estado}</span>
+                      <span> Total: ${parseFloat(orden.total).toFixed(2)}</span>
+                    </div>
+                  </div>
                   <table className="ordenes-table">
                     <thead>
                       <tr>
-                        <th>ID Producto</th>
-                        <th>Nombre</th>
+                        <th>Producto</th>
                         <th>Cantidad</th>
                         <th>Precio Unitario</th>
                         <th>Total</th>
@@ -111,10 +114,14 @@ export function OrdenesPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {detalles.map((detalle) => (
+                      {orden.detalles.map((detalle) => (
                         <tr key={detalle.id}>
-                          <td>{detalle.id_producto}</td>
-                          <td>{detalle.producto.nombre}</td>
+                          <td>
+                            <div className="producto-info">
+                              <span className="producto-nombre">{detalle.producto.nombre}</span>
+                              <span className="producto-id"> ID: {detalle.id_producto}</span>
+                            </div>
+                          </td>
                           <td>{detalle.cantidad}</td>
                           <td>${parseFloat(detalle.precio_unitario).toFixed(2)}</td>
                           <td>${(detalle.cantidad * parseFloat(detalle.precio_unitario)).toFixed(2)}</td>
@@ -123,7 +130,7 @@ export function OrdenesPage() {
                             <img
                               src={detalle.producto.imagen_url}
                               alt={detalle.producto.nombre}
-                              style={{ width: "50px", height: "50px", objectFit: "cover" }}
+                              className="producto-imagen"
                             />
                           </td>
                         </tr>
@@ -132,12 +139,6 @@ export function OrdenesPage() {
                   </table>
                 </section>
               ))
-          ) : loading ? (
-            <p className="loading">Cargando órdenes...</p>
-          ) : error ? (
-            <p className="error">{error}</p>
-          ) : (
-            <p>No se encontraron órdenes con detalles.</p>
           )}
         </main>
       </div>

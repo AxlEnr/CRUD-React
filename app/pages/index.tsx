@@ -28,16 +28,43 @@ export function Index() {
   const [tipoAlerta, setTipoAlerta] = useState<"success" | "error">("success");
   const [productoDetalle, setProductoDetalle] = useState<Producto | null>(null);
   const [productoParaCarrito, setProductoParaCarrito] = useState<Producto | null>(null);
-   const [cantidad, setCantidad] = useState<number>(1);
+  const [cantidad, setCantidad] = useState<number>(1);
   const [carrito, setCarrito] = useState<CarritoItem[]>([]);
   const [mostrarCarrito, setMostrarCarrito] = useState(false);
 
-  useEffect(() => {
-    // Carga inicial del carrito desde localStorage
-    const carritoGuardado = localStorage.getItem("carrito");
-    if (carritoGuardado) {
-      setCarrito(JSON.parse(carritoGuardado));
-    }
+useEffect(() => {
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
+
+    const cargarCarrito = async () => {
+      if (token && userId) {
+        try {
+          const response = await fetch(`${apiUrl}/carrito/usuario/${userId}`, {
+            headers: {
+              "Authorization": `Bearer ${token}`
+            }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            setCarrito(data.items || []);
+          }
+        } catch (error) {
+          console.error("Error al cargar carrito:", error);
+          const carritoGuardado = localStorage.getItem("carrito");
+          if (carritoGuardado) {
+            setCarrito(JSON.parse(carritoGuardado));
+          }
+        }
+      } else {
+        const carritoGuardado = localStorage.getItem("carrito");
+        if (carritoGuardado) {
+          setCarrito(JSON.parse(carritoGuardado));
+        }
+      }
+    };
+
+    cargarCarrito();
   }, []);
 
   useEffect(() => {
@@ -51,14 +78,10 @@ export function Index() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      mostrarAlerta("Token no encontrado. Por favor inicia sesión.", "error");
-      return;
-    }
 
-    fetch(`${apiUrl}/api/productos/todo`, {
+    fetch(`${apiUrl}/productos/todo`, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
       },
     })
       .then((res) => {
@@ -83,31 +106,51 @@ export function Index() {
     setTimeout(() => setMensajeAlerta(null), 4000);
   };
 
-  const agregarAlCarrito = (producto: Producto, cantidadSeleccionada: number) => {
-    if (cantidadSeleccionada > producto.stock) {
-      mostrarAlerta("No hay suficiente stock disponible.", "error");
+const agregarAlCarrito = async (producto: Producto) => {
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
+    
+    if (!token || !userId) {
+      mostrarAlerta("Debes iniciar sesión para agregar productos al carrito", "error");
       return;
     }
 
-    const nuevoCarrito = [...carrito];
-    const indice = nuevoCarrito.findIndex(item => item.id === producto.id);
-    if (indice >= 0) {
-      // Si ya está el producto, sumamos cantidad respetando stock
-      const totalCantidad = nuevoCarrito[indice].cantidad + cantidadSeleccionada;
-      if (totalCantidad > producto.stock) {
-        mostrarAlerta("No hay suficiente stock disponible para esa cantidad.", "error");
-        return;
-      }
-      nuevoCarrito[indice].cantidad = totalCantidad;
-    } else {
-      nuevoCarrito.push({...producto, cantidad: cantidadSeleccionada});
-    }
+    try {
+      const response = await fetch(`${apiUrl}/carrito/usuario/${userId}/agregar/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          id_producto: producto.id,
+          cantidad: 1 // Cantidad fija de 1 por cada clic
+        })
+      });
 
-    setCarrito(nuevoCarrito);
-    localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
-    mostrarAlerta("Producto agregado al carrito.", "success");
-    setProductoParaCarrito(null);
+      if (!response.ok) {
+        throw new Error("Error al agregar al carrito");
+      }
+
+      // Actualizar carrito local
+      const nuevoCarrito = [...carrito];
+      const indice = nuevoCarrito.findIndex(item => item.id === producto.id);
+      
+      if (indice >= 0) {
+        nuevoCarrito[indice].cantidad += 1;
+      } else {
+        nuevoCarrito.push({...producto, cantidad: 1});
+      }
+
+      setCarrito(nuevoCarrito);
+      localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
+      mostrarAlerta(`"${producto.nombre}" agregado al carrito`, "success");
+    } catch (error) {
+      console.error(error);
+      mostrarAlerta("Error al agregar al carrito", "error");
+    }
   };
+
 
   const abrirDetalle = (producto: Producto) => {
     setProductoDetalle(producto);
@@ -129,23 +172,47 @@ export function Index() {
 
   const confirmarAgregarCarrito = () => {
     if (productoParaCarrito && cantidad > 0) {
-      agregarAlCarrito(productoParaCarrito, cantidad);
+      agregarAlCarrito(productoParaCarrito);
       cerrarConfirmarCarrito();
     } else {
       mostrarAlerta("Selecciona una cantidad válida.", "error");
     }
   };
 
+  const eliminarDelCarrito = async (id: number) => {
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
 
-  const eliminarDelCarrito = (id: number) => {
-    const nuevoCarrito = carrito.filter(item => item.id !== id);
-    setCarrito(nuevoCarrito);
-    localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
+    if (!token || !userId) {
+      mostrarAlerta("Debes iniciar sesión para modificar el carrito", "error");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${apiUrl}/carrito/usuario/${userId}/eliminar/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al eliminar del carrito");
+      }
+
+      // Actualizar estado local
+      const nuevoCarrito = carrito.filter(item => item.id !== id);
+      setCarrito(nuevoCarrito);
+      localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
+    } catch (error) {
+      console.error(error);
+      mostrarAlerta("Error al eliminar del carrito", "error");
+    }
   };
 
   const totalCarrito = carrito.reduce((acc, item) => acc + Number(item.precio) * item.cantidad, 0);
 
-  const renderProducto = (producto: Producto) => (
+ const renderProducto = (producto: Producto) => (
     <motion.div
       key={producto.id}
       whileHover={{ scale: 1.03 }}
@@ -175,8 +242,8 @@ export function Index() {
           <button
             className="text-gray-600 hover:text-black-800 text-2xl"
             onClick={(e) => {
-              e.stopPropagation(); // evita abrir detalle al dar click en carrito
-              abrirConfirmarCarrito(producto);
+              e.stopPropagation();
+              agregarAlCarrito(producto);
             }}
             aria-label={`Agregar ${producto.nombre} al carrito`}
           >
@@ -187,67 +254,10 @@ export function Index() {
     </motion.div>
   );
 
+
   return (
     <main>
       <Navbar />
-
-      <button
-        onClick={() => setMostrarCarrito(!mostrarCarrito)}
-        className="fixed top-4 right-4 bg-[var(--secondary-color)]  hover:bg-[var(--extra)]  text-white rounded-full p-4 shadow-lg z-50 my-3"
-        aria-label="Mostrar carrito"
-      >
-        <FaShoppingCart size={38} />
-        {carrito.length > 0 && (
-          <span className="absolute -top-1 -right-1 bg-white text-[var(--extra)] rounded-full text-xs font-bold px-2 py-0.5 shadow-md">
-            {carrito.length}
-          </span>
-        )}
-      </button>
-
-
-      {/* Carrito */}
-      {mostrarCarrito && (
-        <div
-          className="fixed top-16 right-4 bg-white shadow-lg rounded p-4 w-80 max-h-[70vh] overflow-y-auto z-50"
-          aria-label="Carrito de compras"
-        >
-          <h3 className="text-xl font-bold mb-4 text-gray-600">Carrito</h3>
-          {carrito.length === 0 ? (
-            <p className="text-gray-500">Tu carrito está vacío.</p>
-          ) : (
-            <ul className="space-y-3">
-              {carrito.map(item => (
-                <li key={item.id} className="flex justify-between items-center">
-                  <div>
-                    <p className="font-semibold text-black">{item.nombre}</p>
-                    <p className="text-sm text-gray-600">Cantidad: {item.cantidad}</p>
-                    <p className="text-sm font-bold text-black">${(Number(item.precio) * item.cantidad).toFixed(2)}</p>
-                  </div>
-                  <button
-                    onClick={() => eliminarDelCarrito(item.id)}
-                    className="text-red-600 hover:text-red-800 font-bold text-xl"
-                    aria-label={`Eliminar ${item.nombre} del carrito`}
-                  >
-                    &times;
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          {carrito.length > 0 && (
-            <>
-              <p className="font-bold mt-4 text-right text-lg text-black">Total: ${totalCarrito.toFixed(2)}</p>
-              <button
-                onClick={() => alert("Proceder a compra (no implementado)")}
-                className="w-full mt-3 bg-green-600 text-black py-2 rounded hover:bg-green-700 transition"
-              >
-                Comprar
-              </button>
-            </>
-          )}
-        </div>
-      )}
 
       <section className="video-section mb-16">
         <div className="logo-image">
@@ -301,7 +311,7 @@ export function Index() {
         </div>
       </section>
 
-        {/* Modal detalle producto */}
+{/* Modal detalle producto */}
       {productoDetalle && (
         <div
           className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50"
@@ -332,23 +342,9 @@ export function Index() {
               </div>
 
               <div className="mt-6 flex items-center gap-4">
-                <label htmlFor="cantidad" className="font-semibold text-gray-700">Cantidad:</label>
-                <input
-                  id="cantidad"
-                  type="number"
-                  min={1}
-                  max={productoDetalle.stock}
-                  value={cantidad}
-                  onChange={(e) => {
-                    const val = Math.max(1, Math.min(productoDetalle.stock, Number(e.target.value)));
-                    setCantidad(val);
-                  }}
-                  className="border rounded w-30 p-1 text-center text-black"
-                  aria-label="Cantidad a agregar"
-                />
                 <button
-                  className="bg-[var(--secondary-color)]  text-white px-4 py-2 rounded hover:bg-[var(--extra)] transition space-x-1"
-                  onClick={() => agregarAlCarrito(productoDetalle, cantidad)}
+                  className="bg-[var(--secondary-color)] text-white px-4 py-2 rounded hover:bg-[var(--extra)] transition space-x-1"
+                  onClick={() => agregarAlCarrito(productoDetalle)}
                 >
                   Agregar al carrito
                 </button>
@@ -366,107 +362,9 @@ export function Index() {
         </div>
       )}
 
-      {/* Modal confirmar cantidad para carrito (opcional, ahora el detalle ya incluye cantidad) */}
-      {productoParaCarrito && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50"
-          onClick={cerrarConfirmarCarrito}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="confirmarTitulo"
-        >
-          <div
-            className="bg-white rounded-3xl p-6 text-black max-w-md w-full"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2 id="confirmarTitulo" className="text-2xl font-bold mb-4">Agregar al carrito</h2>
-            <p className="mb-4">{productoParaCarrito.nombre}</p>
-            <div className="flex items-center gap-4 mb-4">
-              <label htmlFor="cantidadConfirmar" className="font-semibold">Cantidad:</label>
-              <input
-                id="cantidadConfirmar"
-                type="number"
-                min={1}
-                max={productoParaCarrito.stock}
-                value={cantidad}
-                onChange={(e) => {
-                  const val = Math.max(1, Math.min(productoParaCarrito.stock, Number(e.target.value)));
-                  setCantidad(val);
-                }}
-                className="border rounded w-20 p-1 text-center"
-              />
-            </div>
-            <div className="flex justify-end gap-3">
-              <button onClick={cerrarConfirmarCarrito} className="px-4 py-2 rounded border border-gray-400 hover:bg-gray-100">Cancelar</button>
-              <button
-                onClick={confirmarAgregarCarrito}
-                className="px-4 py-2 rounded bg-[var(--secondary-color)]  text-white hover:bg-[var(--secondary-color)] "
-              >
-                Confirmar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
-      {/* Modal Confirmar cantidad para agregar al carrito */}
-      {productoParaCarrito && (
-        <div
-          onClick={cerrarConfirmarCarrito}
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="confirmarTitulo"
-        >
-          <div
-            onClick={e => e.stopPropagation()}
-            className="bg-white rounded-xl p-6 w-full max-w-sm shadow-lg"
-          >
-            <h2 id="confirmarTitulo" className="text-2xl font-semibold text-gray-800 mb-4">
-              Agregar al carrito
-            </h2>
 
-            <p className="text-gray-700 mb-2 font-medium">
-              {productoParaCarrito.nombre}
-            </p>
-
-            <label htmlFor="cantidadInput" className="block text-gray-600 font-semibold mb-1">
-              Cantidad:
-            </label>
-            <input
-              id="cantidadInput"
-              type="number"
-              min={1}
-              max={productoParaCarrito.stock}
-              value={cantidad}
-              onChange={e => {
-                let val = Number(e.target.value);
-                if (val < 1) val = 1;
-                if (val > productoParaCarrito.stock) val = productoParaCarrito.stock;
-                setCantidad(val);
-              }}
-              className="w-full border text-black border-gray-300 rounded-md px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-[var(--extra)] "
-            />
-
-            <div className="flex justify-end gap-3 mt-4">
-              <button
-                onClick={cerrarConfirmarCarrito}
-                className="px-4 py-2 text-gray-700 border border-gray-300 rounded hover:bg-gray-100 transition"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={confirmarAgregarCarrito}
-                className="px-4 py-2 bg-[var(--secondary-color)]  text-white rounded hover:bg-[var(--extra)]  transition"
-              >
-                Agregar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Mensaje de alerta */}
+{/* Mensaje de alerta */}
       {mensajeAlerta && (
         <div
           className={`fixed bottom-6 left-1/2 transform -translate-x-1/2 px-4 py-3 rounded shadow-lg text-black text-center transition-all duration-300 ${
@@ -478,7 +376,6 @@ export function Index() {
           {mensajeAlerta}
         </div>
       )}
-
     </main>
   );
 }

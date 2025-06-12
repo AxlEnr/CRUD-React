@@ -13,33 +13,38 @@ export function UsuariosPage() {
   const [error, setError] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
 
-
-  const obtenerUsuarios = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const res = await fetch(`${apiUrl}/users`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!res.ok) throw new Error("Error al obtener usuarios");
-
-      const data = await res.json();
-      setUsuarios(data);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Cuando ya haya token, obtener usuarios
   useEffect(() => {
-    if (token) {
-      obtenerUsuarios(token);
-    }
-  }, [token]);
+    // Suponiendo que el token viene de localStorage
+    const storedToken = localStorage.getItem("token");
+    setToken(storedToken);
+  }, []);
+
+  useEffect(() => {
+    if (!token) return;
+
+    const obtenerUsuarios = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const res = await fetch(`${apiUrl}/users`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) throw new Error("Error al obtener usuarios");
+
+        const data = await res.json();
+        console.log(data);
+        setUsuarios(data);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    obtenerUsuarios();
+  }, [token, apiUrl]);
 
   return (
     <div className="layout">
@@ -62,7 +67,6 @@ export function UsuariosPage() {
                   <th>Correo</th>
                   <th>Teléfono</th>
                   <th>Rol</th>
-                  <th>Contraseña</th>
                 </tr>
               </thead>
               <tbody>
@@ -70,11 +74,10 @@ export function UsuariosPage() {
                   <tr key={usuario.id}>
                     <td>{usuario.nombre}</td>
                     <td>{usuario.apellido}</td>
-                    <td>{usuario.edad || "N/A"}</td>
+                    <td>{usuario.edad ?? "N/A"}</td>
                     <td>{usuario.correo}</td>
-                    <td>{usuario.telefono || "N/A"}</td>
+                    <td>{usuario.telefono ?? "N/A"}</td>
                     <td>{usuario.rol}</td>
-                    <td>{usuario.contrasena ? "******" : "N/A"}</td>
                   </tr>
                 ))}
               </tbody>
