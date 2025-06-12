@@ -1,17 +1,90 @@
-.usuarios-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0 8px;
-  margin-top: 1rem;
+/* Reset y layout general */
+body, html, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
   font-family: "Segoe UI", sans-serif;
-  color: #002244; /* Azul fuerte para texto */
+}
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.layout > nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  z-index: 1000;
+}
+
+.layout-body {
+  display: flex;
+  flex: 1;
+  margin-top: 50px;
+  overflow: hidden;
+}
+
+.layout-body > div:first-child {
+  position: fixed;
+  top: 50px;
+  left: 0;
+  bottom: 0;
+  width: 220px;
+  background-color: #ffffff;
+  border-right: 1px solid #ddd;
+  overflow-y: auto;
+  z-index: 900;
+}
+
+.usuarios-container {
+  margin-left: 220px;
+  padding: 16px 20px;
+  height: calc(100vh - 50px);
+  
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.usuarios-container h2 {
+  margin-bottom: 0.8rem;
+  color: #002244;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.table-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto; /* scroll horizontal si se necesita */
+  min-height: 0; /* importante para scroll en flex */
+}
+
+/* Tabla */
+.usuarios-table {
+  min-width: 1500px; /* más ancho */
+  border-collapse: separate;
+  border-spacing: 0 6px;
+  margin-top: 0.8rem;
+  color: #002244;
+  font-size: 0.85rem;
+  width: auto;
 }
 
 .usuarios-table thead th {
   text-align: left;
-  padding: 12px 16px;
-  background-color: #002244; /* Azul marino fuerte */
-  color: #FFD700; /* Dorado */
+  padding: 10px 12px;
+  background-color: #002244;
+  color: #FFD700;
+  user-select: none;
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 
 .usuarios-table thead th:first-child {
@@ -25,7 +98,7 @@
 .usuarios-table tbody tr {
   background-color: #ffffff;
   border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07);
   transition: background-color 0.3s ease;
 }
 
@@ -38,11 +111,18 @@
 }
 
 .usuarios-table td {
-  padding: 12px 16px;
-  color: #002244; /* Texto azul fuerte */
+  padding: 10px 12px;
+  color: #002244;
   font-weight: 500;
+  font-size: 0.85rem;
 }
 
 .usuarios-table td:first-child {
-  border-left: 4px solid #FFD700; /* Línea dorada */
+  border-left: 3px solid #FFD700;
+}
+
+/* Mensajes de error y carga */
+.error {
+  color: #b00020;
+  margin-bottom: 1rem;
 }

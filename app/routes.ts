@@ -12,6 +12,7 @@ const routes = [
   route("/cart", "routes/cart.routes.tsx"),
   route("/usuarios", "routes/usuarios.tsx"),
   route("/profile", "routes/profile.route.tsx"),
+  route('/ordenes', 'routes/ordenes.tsx')
   route("/contact", "routes/contacto.tsx"),
   route("/aboutus", "routes/nosotros.tsx"),
   route('/checkout', 'routes/user/checkout.routes.tsx'),

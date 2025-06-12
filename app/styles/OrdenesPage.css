@@ -1,0 +1,119 @@
+/* Layout general */
+.layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.layout-body {
+  display: flex;
+  flex: 1;
+  overflow: visible; /* Permitimos scroll en hijos */
+}
+
+/* Navbar fijo arriba */
+.layout > nav,
+.layout > div > nav,
+.navbar {
+  height: 60px; /* altura navbar */
+  flex-shrink: 0;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+  color: #f8f8f2;
+}
+
+/* Dashboard sidebar fijo a la izquierda, debajo del navbar */
+.layout-body > div:first-child {
+  width: 240px; /* ancho fijo del sidebar */
+  padding-top: 60px; /* espacio para el navbar */
+  background-color: #44475a; /* fondo sidebar oscuro */
+  overflow-y: auto;
+  position: fixed;
+  top: 60px; /* justo debajo del navbar */
+  left: 0;
+  bottom: 0;
+  border-right: 1px solid #6272a4;
+  color: #f8f8f2;
+}
+
+/* Contenido principal */
+main.ordenes-container {
+  flex: 1;
+  margin-left: 240px; /* espacio para sidebar */
+  margin-top: 60px; /* espacio para navbar */
+  padding: 1rem;
+  height: calc(100vh - 60px);
+  overflow-y: auto;
+  box-sizing: border-box;
+  
+  color: #f8f8f2;
+}
+
+/* Tabla con esquema de colores oscuro */
+.ordenes-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background-color: #1e1e2f; /* fondo oscuro */
+  color: #f0f0f5; /* texto claro */
+  font-weight: 500;
+}
+
+.ordenes-table th,
+.ordenes-table td {
+  border: 1px solid #44475a; /* borde oscuro suave */
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.ordenes-table th {
+  background-color: #282a36; /* encabezado más oscuro */
+  color: #bd93f9; /* color púrpura suave */
+}
+
+.ordenes-table tbody tr:hover {
+  background-color: #44475a; /* hover para filas */
+  color: #f8f8f2;
+}
+
+/* Imágenes con borde para destacarlas */
+.ordenes-table td img {
+  border: 1px solid #6272a4;
+  border-radius: 4px;
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+}
+
+/* Mensajes */
+.error {
+  color: #ff5555; /* rojo vibrante */
+  font-weight: bold;
+}
+
+.loading {
+  font-style: italic;
+  color: #f8f8f2;
+}
+
+/* Responsive: elimina margen sidebar en pantallas pequeñas */
+@media (max-width: 768px) {
+  main.ordenes-container {
+    margin-left: 0;
+    padding-left: 1rem;
+  }
+
+  .layout-body > div:first-child {
+    position: relative;
+    width: 100%;
+    height: auto;
+    padding-top: 0;
+    border-right: none;
+  }
+}
